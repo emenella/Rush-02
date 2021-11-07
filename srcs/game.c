@@ -2,12 +2,107 @@
 
 void		start_game(t_game *g)
 {
+	while(g->finish != 1)
+	{
+		if (g->player == 1)
+		{
+			play(best_plays(g), g, g->player);
+			wait_opposent(g);
+		}
+		else if (g->player == 2)
+		{
+			wait_opposent(g);
+			play(best_plays(g), g, g->player);
+		}
+	}
+}
+
+void wait_opposent(t_game *g)
+{
+	unsigned short moove;
+	scanf("%hu", &moove);
+	if (g->player == 1)
+		play(moove, g, 2);
+	else if (g->player == 2)
+		play(moove, g, 1);
+}
+
+unsigned short	best_plays(t_game *g)
+{
+	t_plateau **posibility;
+	int *scores;
+	int i;
+
+	i = -1;
+	scores = malloc(sizeof(int) * g->plateau->width);
+	while (++i < g->plateau->width)
+		scores[i] = 0;
+	posibility =  get_posibility(g->plateau, g);
+	i = -1;
+	while (++i < g->plateau->width && posibility[i] != NULL)
+		scores[i] = get_score(g->player, posibility[i], g);
+	i = -1;
+	while (++i < g->plateau->width)
+		free(posibility[i]);
+	free(posibility);
+	return (best_posibility(scores, g->plateau->width));
+	
+}
+
+void play(unsigned short pos, t_game *g, unsigned short player)
+{
+	unsigned short j;
+
+	if (g->plateau->map[0][pos] == 0)
+	{
+		j = -1;
+		while (++j < g->plateau->height - 1 && (g->plateau->map[j + 1][pos] != 1 && g->plateau->map[j + 1][pos] != 2));
+		g->plateau->map[j][pos] = player;
+	}
+	ft_putnbr_fd(pos, 1);
+}
+
+unsigned short best_posibility(int *scores, int n)
+{
+	int i;
+	int tmp;
+	int play;
+
+	i = -1;
+	tmp = 0;
+	play = -1;
+	while (++i < n)
+		if (tmp < scores[i])
+		{
+			tmp = scores[i];
+			play = i;
+		}
+	return (play);
 
 }
 
-int			get_score(unsigned short player_id, t_plateau *tab)
+int			get_score(unsigned short player_id, t_plateau *tab, t_game *g)
 {
+	int score;
+	int i;
 
+	t_lines *l;
+	
+	score = 0;
+	i = -1;
+	l = search_line_hori(tab, player_id);
+	while (++i < l->nb_lines)
+		score += search_open(l->lines[i], g, player_id);
+	free_lines(l);
+	l = search_line_vert(tab, player_id);
+	while (++i < l->nb_lines)
+		score += search_open(l->lines[i], g, player_id);
+	free_lines(l);
+	l = search_line_diag(tab, player_id);
+	while (++i < l->nb_lines)
+		score += search_open(l->lines[i], g, player_id);
+
+	return (score);
 }
 
 t_plateau	**get_posibility(t_plateau *tab, t_game *g)
@@ -40,7 +135,7 @@ t_plateau	**get_posibility(t_plateau *tab, t_game *g)
 	return(result);
 }
 
-t_lines		*search_line_vert(t_plateau *tab, t_game *g, unsigned short player)
+t_lines		*search_line_vert(t_plateau *tab, unsigned short player)
 {
 	unsigned short i;
 	unsigned short j;
@@ -70,7 +165,7 @@ t_lines		*search_line_vert(t_plateau *tab, t_game *g, unsigned short player)
 	return (result);
 }
 
-t_lines		*search_line_hori(t_plateau *tab, t_game *g, unsigned short player)
+t_lines		*search_line_hori(t_plateau *tab, unsigned short player)
 {
 	unsigned short i;
 	unsigned short j;
@@ -101,7 +196,7 @@ t_lines		*search_line_hori(t_plateau *tab, t_game *g, unsigned short player)
 	return (result);
 }
 
-t_lines		*search_line_diag(t_plateau *tab, t_game *g, unsigned short player)
+t_lines		*search_line_diag(t_plateau *tab, unsigned short player)
 {
 	unsigned short	i;
 	int				nb_lines;
@@ -117,29 +212,27 @@ t_lines		*search_line_diag(t_plateau *tab, t_game *g, unsigned short player)
 		result->lines = malloc(sizeof(t_line*) * (4 * tab->width - 6));
 	i = -1;
 	while (++i < tab->width)
-		going_to_diag(tab, g, i, 0, result, &nb_lines, player);
+		going_to_diag(tab, i, 0, result, &nb_lines, player);
 	i = 0;
 	while (++i < tab->height)
-		going_to_diag(tab, g, 0, i, result, &nb_lines, player);
+		going_to_diag(tab, 0, i, result, &nb_lines, player);
 	i = -1;
 	while(++i < tab->height)
-		going_to_diag2(tab, g, tab->width - 1, i, result, &nb_lines, player);
+		going_to_diag2(tab, tab->width - 1, i, result, &nb_lines, player);
 	i = tab->width;
-	while (--i != 0);
-		going_to_diag2(tab, g, i, 0, result, &nb_lines, player);
+	while (--i != 0)
+		going_to_diag2(tab, i, 0, result, &nb_lines, player);
 	result->nb_lines = nb_lines;
 	return (result);
 }
 
-void	going_to_diag(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines, unsigned short player)
+void	going_to_diag(t_plateau *tab, unsigned short x, unsigned short y, t_lines *result, int *nb_lines, unsigned short player)
 {
 	unsigned short	posX;
 	unsigned short	posY;
 
-	printf("start: x=%d y=%d\n", x, y);
 	while (x < tab->width && y < tab->height)
 	{
-		printf("x=%d y=%d\n", x, y);
 		if (x < tab->width - 1 && y < tab->height - 1 && tab->map[y][x] == player)
 		{
 			posX = x;
@@ -157,7 +250,7 @@ void	going_to_diag(t_plateau *tab, t_game *g, unsigned short x, unsigned short y
 
 }
 
-void	going_to_diag2(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines, unsigned short player)
+void	going_to_diag2(t_plateau *tab, unsigned short x, unsigned short y, t_lines *result, int *nb_lines, unsigned short player)
 {
 	unsigned short	posX;
 	unsigned short	posY;

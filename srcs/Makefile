@@ -1,4 +1,4 @@
-GCC			=	gcc -g3 -fsanitize=address #-Wall -Werror -Wextra
+GCC			=	gcc -Wall -Werror -Wextra
 LIB 		=
 NAME 		=	rush-02
 SRC 		= 	game.c main.c struct.c

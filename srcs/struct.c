@@ -1,11 +1,11 @@
 #include "./includes/bot.h"
 
-t_plateau 	*init_plateau(int w, int h)
+t_plateau 	*init_plateau(unsigned short w, unsigned short h)
 {
 	t_plateau *p;
 	unsigned short **map;
-	size_t i;
-	size_t j;
+	unsigned short i;
+	unsigned short j;
 
 	p = malloc(sizeof(t_plateau));
 	if (p == NULL)
@@ -62,6 +62,28 @@ t_line		*init_line(t_pos *pos1, t_pos *pos2, unsigned short type)
 	tmp->type = type;
 	return (tmp);
 }
+
+void free_lines(t_lines *l)
+{
+	int i;
+
+	i = -1;
+	while (i < l->nb_lines)
+		free(l->lines[i]);
+	free(l->lines);
+	free(l);
+}
+
+void	free_plateau(t_plateau *p)
+{
+	unsigned short i;
+
+	i = -1;
+	while (++i < p->height)
+		free(p->map[i]);
+	free (p);
+}
+
 void print_map(t_plateau *p)
 {
 	int i = -1;
@@ -90,3 +112,20 @@ void copy_map(t_plateau *dest, t_plateau *src)
 	}
 }
 
+void	ft_putchar_fd(char c, int fd)
+{
+	write(fd, &c, 1);
+}
+
+void	ft_putnbr_fd(unsigned short n, unsigned short fd)
+{
+	if (n <= 9)
+	{
+		ft_putchar_fd(n + '0', fd);
+	}
+	else
+	{
+		ft_putnbr_fd(n / 10, fd);
+		ft_putchar_fd(n % 10 + '0', fd);
+	}
+}
