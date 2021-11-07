@@ -56,6 +56,8 @@ void		print_map(t_plateau *p);
 void		copy_map(t_plateau *dest, t_plateau *src);
 t_lines		*search_line_hori(t_plateau *tab, t_game *g);
 t_lines		*search_line_diag(t_plateau *tab, t_game *g);
+void		going_to_diag(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines);
+void		going_to_diag2(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines);
 
 
 #endif

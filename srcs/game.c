@@ -42,11 +42,11 @@ t_plateau	**get_posibility(t_plateau *tab, t_game *g)
 
 t_lines		*search_line_vert(t_plateau *tab, t_game *g)
 {
-	int i;
-	int j;
-	int posX;
-	int posY;
-	int nb_lines;
+	unsigned short i;
+	unsigned short j;
+	unsigned short posX;
+	unsigned short posY;
+	unsigned short nb_lines;
 	t_lines *result;
 
 	i = -1;
@@ -63,7 +63,7 @@ t_lines		*search_line_vert(t_plateau *tab, t_game *g)
 				posY = j;
 				while(j < tab->height && tab->map[j++][i] == g->player);
 				if (posX != i || posY != --j)
-					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(i, j), 2);
+					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(i, j), 1);
 			}
 	}
 	result->nb_lines = nb_lines;
@@ -72,11 +72,11 @@ t_lines		*search_line_vert(t_plateau *tab, t_game *g)
 
 t_lines		*search_line_hori(t_plateau *tab, t_game *g)
 {
-	int i;
-	int j;
-	int posX;
-	int posY;
-	int nb_lines;
+	unsigned short i;
+	unsigned short j;
+	unsigned short posX;
+	unsigned short posY;
+	unsigned short nb_lines;
 	t_lines *result;
 
 	i = -1;
@@ -103,19 +103,82 @@ t_lines		*search_line_hori(t_plateau *tab, t_game *g)
 
 t_lines		*search_line_diag(t_plateau *tab, t_game *g)
 {
-	int i;
-	int j;
-	int posX;
-	int posY;
-	int nb_lines;
-	t_lines *result;
+	unsigned short	i;
+	int				nb_lines;
+	t_lines			*result;
 
-	i = -1;
 	nb_lines = 0;
 	result = malloc(sizeof(t_lines));
-	result->lines = malloc(sizeof(t_line*) * tab->height);
-	// while (++i < tab->)
+	if (tab->height > tab->width)
+		result->lines = malloc(sizeof(t_line*) * ((tab->height - 1) * 2));
+	if (tab->height < tab->width)
+		result->lines = malloc(sizeof(t_line*) * ((tab->width - 1) * 2));
+	else
+		result->lines = malloc(sizeof(t_line*) * (4 * tab->width - 6));
+	i = -1;
+	while (++i < tab->width)
+		going_to_diag(tab, g, i, 0, result, &nb_lines);
+	i = 0;
+	while (++i < tab->height)
+		going_to_diag(tab, g, 0, i, result, &nb_lines);
+	i = -1;
+	while(++i < tab->height)
+		going_to_diag2(tab, g, tab->width - 1, i, result, &nb_lines);
+	i = tab->width;
+	while (--i != 0);
+		going_to_diag2(tab, g, i, 0, result, &nb_lines);
+	result->nb_lines = nb_lines;
 	return (result);
+}
+
+void	going_to_diag(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines)
+{
+	unsigned short	posX;
+	unsigned short	posY;
+
+	printf("start: x=%d y=%d\n", x, y);
+	while (x < tab->width && y < tab->height)
+	{
+		printf("x=%d y=%d\n", x, y);
+		if (x < tab->width - 1 && y < tab->height - 1 && tab->map[y][x] == g->player)
+		{
+			posX = x;
+			posY = y; 
+			while (x < tab->width - 1 && y < tab->height - 1 && tab->map[y++][x++] == g->player);
+			if (posX != x || posY != y)
+					result->lines[(*nb_lines)++] = init_line(init_pos(posX, posY), init_pos(x, y), 4);
+		}
+		else
+		{
+			x++;
+			y++;
+		}
+	}
+
+}
+
+void	going_to_diag2(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines)
+{
+	unsigned short	posX;
+	unsigned short	posY;
+
+	while (x > 0 && y < tab->height)
+	{
+		if (x != 0 && y < tab->height - 1 && tab->map[y][x] == g->player)
+		{
+			posX = x;
+			posY = y; 
+			while (x != 0 && y < tab->height - 1 && tab->map[y++][x--] == g->player);
+			if (posX != x && posY != y)
+					result->lines[(*nb_lines)++] = init_line(init_pos(x, y), init_pos(posX, posY), 3);
+		}
+		else
+		{
+			x--;
+			y++;
+		}
+	}
+
 }
 
 int	search_open(t_line *l, t_game *g)
@@ -157,7 +220,7 @@ int	search_open(t_line *l, t_game *g)
 		{
 			pos_pos1[0].x = l->pos1->x - 1;
 			pos_pos1[0].y = l->pos1->y + 1;
-			pos_pos1[1].y = pos_pos1[0].y - 1;
+			pos_pos1[1].y = pos_pos1[0].y + 1;
 			pos_pos1[1].x = pos_pos1[0].x;
 			if (pos_pos1[1].x < g->plateau->width || pos_pos1[1].x < g->plateau->width || g->plateau->map[pos_pos1[1].y][pos_pos1[1].x] == g->player)
 				result++;
@@ -166,9 +229,9 @@ int	search_open(t_line *l, t_game *g)
 		{
 			pos_pos2[0].x = l->pos2->x + 1;
 			pos_pos2[0].y = l->pos2->y - 1;
-			pos_pos2[1].y = pos_pos2[0].y -1;
+			pos_pos2[1].y = pos_pos2[0].y + 1;
 			pos_pos2[1].x = pos_pos2[0].x;
-			if (pos_pos2[1].x < g->plateau->width || pos_pos2[1].x < g->plateau->width || g->plateau->map[pos_pos2[1].y][pos_pos2[1].x] == g->player)
+			if (pos_pos2[1].x < g->plateau->width && pos_pos2[1].x < g->plateau->width && g->plateau->map[pos_pos2[1].y][pos_pos2[1].x] == g->player)
 				result++;
 		}
 		
@@ -179,9 +242,9 @@ int	search_open(t_line *l, t_game *g)
 		{
 			pos_pos1[0].x = l->pos1->x - 1;
 			pos_pos1[0].y = l->pos1->y - 1;
-			pos_pos1[1].y = pos_pos1[0].y - 1;
+			pos_pos1[1].y = pos_pos1[0].y + 1;
 			pos_pos1[1].x = pos_pos1[0].x;
-			if (pos_pos1[1].x < g->plateau->width || pos_pos1[1].x < g->plateau->width || g->plateau->map[pos_pos1[1].y][pos_pos1[1].x] == g->player)
+			if (g->plateau->map[pos_pos1[1].y][pos_pos1[1].x] == g->player)
 				result++;
 		}
 		if (l->pos2->x < g->plateau->width - 1 && l->pos2->y < g->plateau->height)
@@ -189,8 +252,8 @@ int	search_open(t_line *l, t_game *g)
 			pos_pos2[0].x = l->pos2->x + 1;
 			pos_pos2[0].y = l->pos2->y + 1;
 			pos_pos2[1].x = pos_pos2[0].x;
-			pos_pos2[1].y = pos_pos2[0].y -1;
-			if (pos_pos2[1].x < g->plateau->width || pos_pos2[1].x < g->plateau->width || g->plateau->map[pos_pos2[1].y][pos_pos2[1].x] == g->player)
+			pos_pos2[1].y = pos_pos2[0].y + 1;
+			if (pos_pos2[1].x < g->plateau->width && pos_pos2[1].y < g->plateau->height && g->plateau->map[pos_pos2[1].y][pos_pos2[1].x] == g->player)
 				result++;
 		}
 	}
