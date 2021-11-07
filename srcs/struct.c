@@ -34,7 +34,7 @@ t_plateau 	*init_plateau(int w, int h)
 
 void	init_game(t_game *g)
 {
-	scanf("%hu%hu%hu%hu%hu%hu", g->plateau->width, g->plateau->height, g->nb_piece, g->player, NULL, NULL);
+	scanf("%hu%hu%hu%hu%hu%hu", &g->plateau->width, &g->plateau->height, &g->nb_piece, &g->player, &g->total_time, &g->time_gain);
 	g->plateau = init_plateau(g->plateau->width, g->plateau->height);
 	g->finish = 0;
 }
@@ -50,7 +50,7 @@ t_pos		*init_pos(int x, int y)
 	return (tmp);
 }
 
-t_line		*init_line(t_pos *pos1, t_pos *pos2, unsigned short width, unsigned short type)
+t_line		*init_line(t_pos *pos1, t_pos *pos2, unsigned short type)
 {
 	t_line *tmp;
 	tmp = malloc(sizeof(t_line));
@@ -58,17 +58,35 @@ t_line		*init_line(t_pos *pos1, t_pos *pos2, unsigned short width, unsigned shor
 		return (tmp);
 	tmp->pos1 = pos1;
 	tmp->pos2 = pos2;
-	tmp->width - width;
+	tmp->width = sqrt(pow(pos2->x - pos1->x, 2)+ pow(pos2->y - pos1->y, 2));
 	tmp->type = type;
 	return (tmp);
 }
+void print_map(t_plateau *p)
+{
+	int i = -1;
+	int j = -1;
+	while (++i < p->height)
+	{
+		j = -1;
+		while(++j < p->width)
+			printf("%d ", p->map[i][j]);
+		printf("\n");
+	}
+	printf("\n");
+}
 
-// int i = -1;
-// 	int j = -1;
-// 	while (i++ < plateau->height)
-// 	{
-// 		j = -1;
-// 		while(++j < plateau->width)
-// 			printf("%d", plateau->map[i][j]);
-// 		printf("\n");
-// 	}
+void copy_map(t_plateau *dest, t_plateau *src)
+{
+	size_t i;
+	size_t j;
+
+	i = -1;
+	while (++i < src->height)
+	{
+		j = -1;
+		while (++j < src->width)
+			dest->map[i][j] = src->map[i][j];
+	}
+}
+
