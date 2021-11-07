@@ -63,7 +63,7 @@ t_lines		*search_line_vert(t_plateau *tab, t_game *g)
 				posY = j;
 				while(j < tab->height && tab->map[j++][i] == g->player);
 				if (posX != i || posY != --j)
-					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(i, j), 1);
+					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(i, j), 2);
 			}
 	}
 	result->nb_lines = nb_lines;
@@ -94,7 +94,7 @@ t_lines		*search_line_hori(t_plateau *tab, t_game *g)
 				posY = i;
 				while(j < tab->width && tab->map[i][j++] == g->player);
 				if (posX != --j || posY != i)
-					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(j, i), 2);
+					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(j, i), 1);
 			}
 	}
 	result->nb_lines = nb_lines;

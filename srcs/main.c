@@ -21,7 +21,7 @@ int main(void)
 	posible = get_posibility(posible[3], &g);
 	posible = get_posibility(posible[4], &g);
 	print_map(posible[5]);
-	t_lines *lines = search_line_diag(posible[5], &g);
+	t_lines *lines = search_line_hori(posible[5], &g);
 	g.plateau = posible[5];
 	printf("%d\n", lines->nb_lines);
 	printf("\n");
