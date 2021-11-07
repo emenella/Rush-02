@@ -56,16 +56,65 @@ t_lines		*search_line_vert(t_plateau *tab, t_game *g)
 	while(++i < tab->width)
 	{
 		j = -1;
-		while (++j < tab->height - 1)
+		while (++j < tab->height)
 			if(tab->map[j][i] == g->player)
 			{
 				posX = i;
 				posY = j;
 				while(j < tab->height && tab->map[j++][i] == g->player);
-				result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(i, j), 2);
+				if (posX != i || posY != --j)
+					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(i, j), 2);
 			}
 	}
 	result->nb_lines = nb_lines;
+	return (result);
+}
+
+t_lines		*search_line_hori(t_plateau *tab, t_game *g)
+{
+	int i;
+	int j;
+	int posX;
+	int posY;
+	int nb_lines;
+	t_lines *result;
+
+	i = -1;
+	nb_lines = 0;
+	result = malloc(sizeof(t_lines));
+	result->lines = malloc(sizeof(t_line*) * tab->height);
+	print_map(tab);
+	while(++i < tab->height)
+	{
+		j = -1;
+		while (++j < tab->width)
+			if(tab->map[i][j] == g->player)
+			{
+				posX = j;
+				posY = i;
+				while(j < tab->width && tab->map[i][j++] == g->player);
+				if (posX != --j || posY != i)
+					result->lines[nb_lines++] = init_line(init_pos(posX, posY), init_pos(j, i), 2);
+			}
+	}
+	result->nb_lines = nb_lines;
+	return (result);
+}
+
+t_lines		*search_line_diag(t_plateau *tab, t_game *g)
+{
+	int i;
+	int j;
+	int posX;
+	int posY;
+	int nb_lines;
+	t_lines *result;
+
+	i = -1;
+	nb_lines = 0;
+	result = malloc(sizeof(t_lines));
+	result->lines = malloc(sizeof(t_line*) * tab->height);
+	// while (++i < tab->)
 	return (result);
 }
 
