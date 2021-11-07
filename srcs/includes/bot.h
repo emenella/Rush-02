@@ -50,14 +50,14 @@ t_line		*init_line(t_pos *pos1, t_pos *pos2, unsigned short type);
 int			get_score(unsigned short player_id, t_plateau *tab);
 t_plateau	**get_posibility(t_plateau *tab, t_game *g);
 t_plateau 	*init_plateau(int w, int h);
-t_lines		*search_line_vert(t_plateau *tab, t_game *g);
-int			search_open(t_line *l, t_game *g);
+t_lines		*search_line_vert(t_plateau *tab, t_game *g, unsigned short player);
+int			search_open(t_line *l, t_game *g, unsigned short player);
 void		print_map(t_plateau *p);
 void		copy_map(t_plateau *dest, t_plateau *src);
-t_lines		*search_line_hori(t_plateau *tab, t_game *g);
-t_lines		*search_line_diag(t_plateau *tab, t_game *g);
-void		going_to_diag(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines);
-void		going_to_diag2(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines);
+t_lines		*search_line_hori(t_plateau *tab, t_game *g, unsigned short player);
+t_lines		*search_line_diag(t_plateau *tab, t_game *g, unsigned short player);
+void		going_to_diag(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines, unsigned short player);
+void		going_to_diag2(t_plateau *tab, t_game *g, unsigned short x, unsigned short y, t_lines *result, int *nb_lines, unsigned short player);
 
 
 #endif
